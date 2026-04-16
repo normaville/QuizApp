@@ -8,14 +8,23 @@ import { ThemeProvider, createTheme, Button, ButtonGroup, Text } from '@rneui/th
 const Stack = createNativeStackNavigator();
 const theme = createTheme({});
 
+// GitHub Pages Routing Configuration
+const linking = {
+  prefixes: [window.location.origin],
+  config: {
+    screens: {
+      Question: 'question',
+      Summary: 'summary',
+    },
+  },
+};
+
 /* 
 Correct Answers for sample data:
-1. "multiple-choice" -> pure vanilla (index 0)
+1. "multiple-choice" -> Pure Vanilla Cookie (index 0)
 2. "multiple-answer" -> Pure Vanilla and Hollyberry (index 0, 2)
-3. "true-false"      -> true (index 1)
+3. "true-false"      -> True (index 0)
 */
-
-// questions taken from https://uquiz.com/Quiz/Question/BhnFXT/1
 
 export const Question = ({ route, navigation }) => {
   const { data, index, userResults = [] } = route.params;
@@ -28,7 +37,7 @@ export const Question = ({ route, navigation }) => {
   const handleNext = () => {
     const selected = isMultiple ? multiIdxs : singleIdx;
     
-    // Check correctness
+    // Logic: Array comparison for multi-answer, strict value for others
     const isCorrect = Array.isArray(current.correct)
       ? JSON.stringify([...selected].sort()) === JSON.stringify([...current.correct].sort())
       : selected === current.correct;
@@ -55,13 +64,14 @@ export const Question = ({ route, navigation }) => {
         selectedIndexes={isMultiple ? multiIdxs : []}
         onPress={(val) => isMultiple ? setMultiIdxs(val) : setSingleIdx(val)}
         vertical
+        containerStyle={styles.buttonGroup}
       />
       <Button
         testID="next-question"
         title="Next Question"
         onPress={handleNext}
         disabled={!hasSelection}
-        containerStyle={{ marginTop: 20 }}
+        containerStyle={styles.nextBtn}
       />
     </View>
   );
@@ -81,11 +91,11 @@ export const Summary = ({ route }) => {
             const isCorrectAnswer = Array.isArray(item.correct) ? item.correct.includes(cIdx) : item.correct === cIdx;
             const isSelected = Array.isArray(item.selected) ? item.selected.includes(cIdx) : item.selected === cIdx;
 
-            let textStyle = {};
-            if (isCorrectAnswer && isSelected) textStyle = styles.correctBold;
-            else if (!isCorrectAnswer && isSelected) textStyle = styles.incorrectStrike;
+            let textStyle = styles.choiceBase;
+            if (isCorrectAnswer && isSelected) textStyle = [styles.choiceBase, styles.correctBold];
+            else if (!isCorrectAnswer && isSelected) textStyle = [styles.choiceBase, styles.incorrectStrike];
 
-            return <Text key={cIdx} style={textStyle}>- {choice}</Text>;
+            return <Text key={cIdx} style={textStyle}>• {choice}</Text>;
           })}
         </View>
       ))}
@@ -117,7 +127,7 @@ export default function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <NavigationContainer>
+      <NavigationContainer linking={linking}>
         <Stack.Navigator initialRouteName="Question">
           <Stack.Screen name="Question" component={Question} initialParams={{ data: quizData, index: 0 }} />
           <Stack.Screen name="Summary" component={Summary} />
@@ -131,8 +141,11 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: '#fff' },
   prompt: { marginBottom: 20, textAlign: 'center' },
   center: { textAlign: 'center', marginVertical: 20 },
+  buttonGroup: { marginBottom: 20 },
+  nextBtn: { borderRadius: 8 },
   summaryItem: { marginBottom: 20, paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: '#eee' },
   bold: { fontWeight: 'bold', marginBottom: 5 },
-  correctBold: { fontWeight: 'bold' },
-  incorrectStrike: { textDecorationLine: 'line-through' }
+  choiceBase: { color: '#444', fontSize: 14, marginVertical: 2 },
+  correctBold: { fontWeight: 'bold', color: 'green' },
+  incorrectStrike: { textDecorationLine: 'line-through', color: 'red' }
 });
