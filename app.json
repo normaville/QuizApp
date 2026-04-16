@@ -8,7 +8,7 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "experiments": {
-      "baseUrl": "/your-repo-name"
+      "baseUrl": "/QuizApp"
     },
     "splash": {
       "image": "./assets/splash-icon.png",
