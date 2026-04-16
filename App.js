@@ -15,6 +15,8 @@ Correct Answers for sample data:
 3. "true-false"      -> true (index 1)
 */
 
+// questions taken from https://uquiz.com/Quiz/Question/BhnFXT/1
+
 export const Question = ({ route, navigation }) => {
   const { data, index, userResults = [] } = route.params;
   const current = data[index];
